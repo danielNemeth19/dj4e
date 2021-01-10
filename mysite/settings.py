@@ -27,10 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+OWNER_HASH = "7c1bbdae"
+
 
 # Application definition
 
 INSTALLED_APPS = [
+    'home.apps.HomeConfig',
+    'hello.apps.HelloConfig',
     'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
