@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views import generic
+from django.conf import settings
 
 from polls.models import Question, Choice
 
@@ -45,5 +46,5 @@ def vote(request, question_id):
 
 
 def owner(request):
-    return HttpResponse("Hello, world. a65f0f28 is the polls index.")
+    return HttpResponse(f"Hello, world. {settings.OWNER_HASH} is the polls index.")
 
