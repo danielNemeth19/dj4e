@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'crispy_forms',
     'rest_framework',
-    # 'social_django',
+    'social_django',
     'home.apps.HomeConfig',
     'ads.apps.AdsConfig'
 ]
@@ -150,7 +150,7 @@ try:
     from . import github_settings
     SOCIAL_AUTH_GITHUB_KEY = github_settings.SOCIAL_AUTH_GITHUB_KEY
     SOCIAL_AUTH_GITHUB_SECRET = github_settings.SOCIAL_AUTH_GITHUB_SECRET
-except:
+except ImportError:
     print('When you want to use social login, please see dj4e-samples/github_settings-dist.py')
 
 # https://python-social-auth.readthedocs.io/en/latest/configuration/django.html#authentication-backends

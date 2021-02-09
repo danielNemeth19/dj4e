@@ -83,3 +83,6 @@ coverage.xml
 
 # Database specific
 *.sqlite3
+
+# secret
+.env
