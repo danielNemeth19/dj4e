@@ -6,15 +6,27 @@ from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-from ads.models import Ad, Comment
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.db.utils import IntegrityError
+
+from ads.models import Ad, Comment, Fav
 from ads.owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
 from ads.forms import CreateForm, CommentForm
 
 
 class AdListView(OwnerListView):
     model = Ad
-    # By convention:
-    # template_name = "myarts/article_list.html"
+    template_name = "ads/ad_list.html"
+
+    def get(self, request, **kwargs):
+        ad_list = Ad.objects.all()
+        favorites = list()
+        if request.user.is_authenticated:
+            rows = request.user.favorite_ads.values('id')
+            favorites = [row['id'] for row in rows]
+        context = dict(ad_list=ad_list, favorites=favorites)
+        return render(request, self.template_name, context)
 
 
 class AdDetailView(OwnerDetailView):
@@ -103,3 +115,26 @@ class CommentDeleteView(OwnerDeleteView):
     def get_success_url(self):
         ad = self.object.ad
         return reverse('ads:ad_detail', args=[ad.id])
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AddFavoriteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        ad = get_object_or_404(Ad, id=pk)
+        fav = Fav(ad=ad, user=request.user)
+        try:
+            fav.save()
+        except IntegrityError:
+            pass
+        return HttpResponse()
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DeleteFavoriteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        ad = get_object_or_404(Ad, id=pk)
+        try:
+            fav = Fav.objects.get(ad=ad, user=request.user).delete()
+        except Fav.DoesNotExist:
+            pass
+        return HttpResponse()
