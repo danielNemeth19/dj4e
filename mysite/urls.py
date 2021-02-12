@@ -27,32 +27,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),  # Keep
     url(r'^oauth/', include('social_django.urls', namespace='social')),  # Keep
     path('ads/', include('ads.urls')),
-
-    # # Sample applications
-    # path('hello/', include('hello.urls')),
-    # path('users/', include('users.urls')),
-    # path('tracks/', include('tracks.urls')),
-    # path('views/', include('views.urls')),
-    # path('route/', include('route.urls', namespace='nsroute')),
-    # path('tmpl/', include('tmpl.urls')),
-    # path('gview/', include('gview.urls')),
-    # path('session/', include('session.urls')),
-    # path('authz/', include('authz.urls')),
-    # path('getpost/', include('getpost.urls')),
-    # path('form/', include('form.urls')),
-    # path('crispy/', include('crispy.urls')),
-    # path('myarts/', include('myarts.urls')),
-    # path('menu/', include('menu.urls')),
-    # path('forums/', include('forums.urls')),
-    # path('pics/', include('pics.urls')),
-    # path('favs/', include('favs.urls')),
-    # path('favsql/', include('favsql.urls')),
-    # path('rest/', include('rest.urls')),
-    # path('autos/', include('autos.urls')),
-    # path('usermodel/', include('usermodel.urls')),
-    # path('chat/', include('chat.urls')),
-    # path('util/', include('util.urls')),
-    # path('well/', include('well.urls')),
 ]
 
 # Serve the static HTML
@@ -76,13 +50,13 @@ urlpatterns += [
 
 # Switch to social login if it is configured - Keep for later
 try:
-    from . import github_settings
+    from mysite import github_settings
     social_login = 'registration/login_social.html'
     urlpatterns.insert(0,
                        path('accounts/login/', auth_views.LoginView.as_view(template_name=social_login))
                        )
     print('Using', social_login, 'as the login template')
-except:
+except ImportError:
     print('Using registration/login.html as the login template')
 
 # References
