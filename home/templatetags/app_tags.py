@@ -18,4 +18,5 @@ def gravatar(user, size=35):
     email = str(user.email.strip().lower()).encode('utf-8')
     email_hash = md5(email).hexdigest()
     url = "//www.gravatar.com/avatar/{0}?s={1}&d=identicon&r=PG"
+    print(url.format(email_hash, size))
     return url.format(email_hash, size)

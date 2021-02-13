@@ -12,12 +12,26 @@ class Ad(models.Model):
     text = models.TextField()
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     picture = models.BinaryField(null=True, editable=True)
+
+    favorites = models.ManyToManyField(settings.AUTH_USER_MODEL, through='Fav', related_name='favorite_ads')
+
     content_type = models.CharField(max_length=256, null=True, help_text='The MIMEType of the file')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
+
+
+class Fav(models.Model):
+    ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favs_users')
+
+    class Meta:
+        unique_together = ('ad', 'user')
+
+    def __str__(self) :
+        return '%s likes %s'%(self.user.username, self.ad.title[:10])
 
 
 class Comment(models.Model):
