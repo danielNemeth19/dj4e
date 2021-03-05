@@ -1,17 +1,16 @@
-from django.urls import reverse_lazy
 from django.views import View
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.files.uploadedfile import InMemoryUploadedFile
-
+from django.db.models import Q
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.db.utils import IntegrityError
 
 from ads.models import Ad, Comment, Fav
-from ads.owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
+from ads.owner import OwnerListView, OwnerDetailView, OwnerDeleteView
 from ads.forms import CreateForm, CommentForm
 
 
@@ -20,12 +19,20 @@ class AdListView(OwnerListView):
     template_name = "ads/ad_list.html"
 
     def get(self, request, **kwargs):
+        search_str = self.request.GET.get("search", None)
         ad_list = Ad.objects.all()
+        if search_str:
+            search_filter = Q(title__contains=search_str) | Q(text__contains=search_str)
+            ad_list = ad_list.filter(search_filter)
+
+        for ad in ad_list:
+            ad.natural_updated = naturaltime(ad.updated_at)
+
         favorites = list()
         if request.user.is_authenticated:
             rows = request.user.favorite_ads.values('id')
             favorites = [row['id'] for row in rows]
-        context = dict(ad_list=ad_list, favorites=favorites)
+        context = dict(ad_list=ad_list, favorites=favorites, search=search_str)
         return render(request, self.template_name, context)
 
 
